@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML;
+using Microsoft.ML.Models;
 using Microsoft.ML.Trainers;
 using Microsoft.ML.Transforms;
 using System;
@@ -15,6 +16,7 @@ namespace SentimentAnalysis
         static void Main(string[] args)
         {
             var model = TrainAndPredict();
+            Evaluate(model);
         }
 
         public static PredictionModel<SentimentData, SentimentPrediction> TrainAndPredict()
@@ -60,6 +62,22 @@ namespace SentimentAnalysis
             Console.WriteLine();
 
             return model;
+        }
+
+        public static void Evaluate(PredictionModel<SentimentData, SentimentPrediction> model)
+        {
+            // Evaluate model
+            var testData = new TextLoader<SentimentData>(_testDataPath, useHeader: true, separator: "tab");
+            var evaluator = new BinaryClassificationEvaluator();
+            BinaryClassificationMetrics metrics = evaluator.Evaluate(model, testData);
+
+            // Display evaluation
+            Console.WriteLine();
+            Console.WriteLine("PredictionModel quality metrics evaluation");
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine($"Accuracy: {metrics.Accuracy:P2}");
+            Console.WriteLine($"Auc: {metrics.Auc:P2}");
+            Console.WriteLine($"F1Score: {metrics.F1Score:P2}");
         }
     }
 }
