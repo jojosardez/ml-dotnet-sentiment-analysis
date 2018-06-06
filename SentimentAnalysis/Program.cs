@@ -15,11 +15,36 @@ namespace SentimentAnalysis
 
         static void Main(string[] args)
         {
-            var model = TrainAndPredict();
-            Evaluate(model);
+            Console.WriteLine("Sentiment analysis using ML.NET");
+            Console.WriteLine();
+            Console.WriteLine("Sample positive comment: \"He is the best, and the article should say that.\"");
+            Console.WriteLine("Sample negative comment: \"Please refrain from adding nonsense to Wikipedia.\"");
+            Console.WriteLine();
+            
+            while (true)
+            {
+                Console.WriteLine("Type in your comment or type in 'exit' and press [ENTER]:");
+                var input = Console.ReadLine()?.Trim();
+
+                if (string.IsNullOrEmpty(input))
+                {
+                    Console.WriteLine("Invalid input. Please try again.");
+                    continue;
+                }
+
+                if (string.Equals(input, "exit", StringComparison.OrdinalIgnoreCase))
+                    break;
+                else
+                {
+                    var model = TrainAndPredict(input);
+                    Evaluate(model);
+                    Console.WriteLine();
+                    Console.WriteLine();
+                }
+            }
         }
 
-        public static PredictionModel<SentimentData, SentimentPrediction> TrainAndPredict()
+        public static PredictionModel<SentimentData, SentimentPrediction> TrainAndPredict(string comment)
         {
             // Ingest the data
             var pipeline = new LearningPipeline();
@@ -39,11 +64,7 @@ namespace SentimentAnalysis
             {
                 new SentimentData
                 {
-                    SentimentText = "Please refrain from adding nonsense to Wikipedia."
-                },
-                new SentimentData
-                {
-                    SentimentText = "He is the best, and the article should say that."
+                    SentimentText = comment
                 }
             };
 
