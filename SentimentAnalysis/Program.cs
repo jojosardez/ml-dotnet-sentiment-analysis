@@ -1,6 +1,9 @@
 ﻿using Microsoft.ML;
 using Microsoft.ML.Trainers;
 using Microsoft.ML.Transforms;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SentimentAnalysis
 {
@@ -28,6 +31,33 @@ namespace SentimentAnalysis
 
             // Train the model
             PredictionModel<SentimentData, SentimentPrediction> model = pipeline.Train<SentimentData, SentimentPrediction>();
+
+            // Data
+            IEnumerable<SentimentData> sentiments = new[]
+            {
+                new SentimentData
+                {
+                    SentimentText = "Please refrain from adding nonsense to Wikipedia."
+                },
+                new SentimentData
+                {
+                    SentimentText = "He is the best, and the article should say that."
+                }
+            };
+
+            // Prediction
+            IEnumerable<SentimentPrediction> predictions = model.Predict(sentiments);
+            var sentimentsAndPredictions = sentiments.Zip(predictions, (sentiment, prediction) => (sentiment, prediction));
+
+            // Display prediction / sentiment
+            Console.WriteLine();
+            Console.WriteLine("Sentiment Predictions");
+            Console.WriteLine("---------------------");
+            foreach (var item in sentimentsAndPredictions)
+            {
+                Console.WriteLine($"Sentiment: {item.sentiment.SentimentText} | Prediction: {(item.prediction.Sentiment ? "Positive" : "Negative")}");
+            }
+            Console.WriteLine();
 
             return model;
         }
